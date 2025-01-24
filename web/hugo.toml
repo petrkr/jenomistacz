@@ -1,0 +1,3 @@
+baseURL = 'https://jenomista.cz/'
+languageCode = 'cz-cs'
+title = 'Jenomista'

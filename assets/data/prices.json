@@ -19,5 +19,7 @@
   { "id": 13, "category": "Youtuberi", "name": "Kicom Pateron Moon special", "price": 300 }, 
   { "id": 10, "category": "Youtuberi", "name": "Czexperiment Hero Hero", "price": 100 },
   { "id": 11, "category": "Youtuberi", "name": "Starej fotr Hero Hero", "price": 170 },
-  { "id": 12, "category": "Youtuberi", "name": "Kryptoplebs Hero Hero", "price": 170 }
+  { "id": 12, "category": "Youtuberi", "name": "Kryptoplebs Hero Hero", "price": 170 },
+  { "id": 22, "category": "Youtuberi", "name": "Segment Hero Hero", "price": 125 },
+  { "id": 22, "category": "Youtuberi", "name": "Kluci z Prahy Hero Hero", "price": 125 }
 ]

@@ -12,7 +12,6 @@ V tomto výkladu je jenomista například i novinář, youtuber, publicista nebo
 
 Dalsi kategorie jenomistu je, kdyz vam nekdo rekne, ze mate delat nejakou aktivitu, protoze to je jenom... Kuprikladu, bez si rano zabehat, je to jenom 10 minut. Udelej si rano snidani, bude to jenom 15 minut. Mel by sis zacvicit, je to jenom pul hodiny. V konecnem dusledku je to oto vstavat o 2 hodiny drive, aby se vsechna "jenom" stihhla.
 
-<strong>ahoj</strong>
 Zde si můžete spočítat, na kolik vás to "jenom" vyjde měsíčně, kdybyste si měli předplatit všechny služby, o kterých vám jenomista řekne: "Vždyť je to jenom..."
 
 [Proof-of-concept cenova tabulka sluzeb](calculators/prices)

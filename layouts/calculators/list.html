@@ -4,11 +4,7 @@
     <main>
       <article>
         <header>
-            test template
           <h1>{{ .Title }}</h1>
-          {{ with .Params.date }}
-            <time datetime="{{ . }}">{{ . | safeHTML }}</time>
-          {{ end }}
         </header>
         {{ .Content }}
       </article>

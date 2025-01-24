@@ -1,5 +1,7 @@
 ---
-title: "Kalkulacky"
+title: "Kalkulacky pro jenomisty"
 ---
 
-Seznam kalkulacek
+## Seznam kalkulacek
+
+[Ceny](prices)

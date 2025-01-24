@@ -51,11 +51,7 @@
     </style>
     <script>
         function loadTable(callback) {
-          {{ with resources.Get "data/prices.json" }}
-          {{ with resources.Copy "data/prices.json" . }}
-            fetch('{{ .RelPermalink }}')
-          {{ end }}
-          {{ end }}
+            fetch('{{ (resources.Get "data/prices.json" | minify).RelPermalink }}')
                 .then(response => response.json())
                 .then(services => {
                     const tableBody = document.getElementById("service-table-body");

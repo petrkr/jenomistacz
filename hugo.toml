@@ -1,3 +1,4 @@
 baseURL = 'https://jenomista.cz/'
 languageCode = 'cz-cs'
 title = 'Jenomista'
+disableKinds = ["taxonomy"]

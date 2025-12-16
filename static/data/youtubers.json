@@ -1,0 +1,12 @@
+[
+  { "id": 1, "name": "MadBBQ Hero Hero", "price": 170 },
+  { "id": 2, "name": "Mistr Malek Hero Hero", "price": 170 },
+  { "id": 3, "name": "Kicom Pateron Moon", "price": 150 },
+  { "id": 4, "name": "Kicom Pateron Moon special", "price": 300 },
+  { "id": 5, "name": "Czexperiment Hero Hero", "price": 100 },
+  { "id": 6, "name": "Starej fotr Hero Hero", "price": 170 },
+  { "id": 7, "name": "Kryptoplebs Hero Hero", "price": 240 },
+  { "id": 8, "name": "Segment Hero Hero", "price": 120 },
+  { "id": 9, "name": "Kluci z Prahy Hero Hero", "price": 120 },
+  { "id": 10, "name": "Standashow Talk.cz", "price": 249 }
+]

@@ -1,0 +1,12 @@
+[
+  { "id": 1, "name": "iDNES Premium bez reklam", "price": 149 },
+  { "id": 2, "name": "iDNES Premium s reklamou", "price": 99 },
+  { "id": 3, "name": "Blesk", "price": 199 },
+  { "id": 4, "name": "Deník N Zaklad", "price": 249 },
+  { "id": 5, "name": "Deník N s Klub N", "price": 369 },
+  { "id": 6, "name": "Hospodarske Noviny", "price": 199 },
+  { "id": 7, "name": "Hospodarske Noviny +", "price": 299 },
+  { "id": 8, "name": "Hospodarske Noviny + vikend", "price": 457 },
+  { "id": 9, "name": "Hospodarske Noviny + tisk", "price": 850 },
+  { "id": 10, "name": "Seznam", "price": 30 }
+]

@@ -1,0 +1,6 @@
+[
+  { "id": 1, "name": "Zpravodajstvi", "slug": "news", "file": "news.json" },
+  { "id": 2, "name": "Zabava", "slug": "fun", "file": "entertainment.json" },
+  { "id": 3, "name": "Cloud Sluzby", "slug": "cloud", "file": "cloud.json" },
+  { "id": 4, "name": "Youtuberi", "slug": "yt", "file": "youtubers.json" }
+]

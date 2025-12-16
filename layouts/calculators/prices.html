@@ -45,34 +45,76 @@
         .content {
             margin-top: 60px;
         }
-	#total-price {
-	    font-weight: bold;
-	}
+        #total-price {
+            font-weight: bold;
+        }
+        .info-box {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+        .stats {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script>
-        function loadTable(callback) {
-            fetch('{{ (resources.Get "data/prices.json" | minify).RelPermalink }}')
-                .then(response => response.json())
-                .then(services => {
-                    const tableBody = document.getElementById("service-table-body");
-                    let category = "";
-                    let html = "";
+        let categories = [];
+        let servicesByCategory = {};
 
-                    services.forEach(service => {
-                        if (category !== service.category) {
-                            category = service.category;
-                            html += `<tr><th colspan='3'>${category}</th></tr>`;
-                        }
+        async function loadTable(callback) {
+            try {
+                // Load category definitions
+                const categoriesResponse = await fetch('/data/categories.json');
+                categories = await categoriesResponse.json();
+
+                // Load all categories in parallel
+                const categoryPromises = categories.map(async (cat) => {
+                    const response = await fetch(`/data/${cat.file}`);
+                    const services = await response.json();
+                    servicesByCategory[cat.slug] = {
+                        id: cat.id,
+                        name: cat.name,
+                        services: services,
+                        maxId: Math.max(...services.map(s => s.id))
+                    };
+                });
+
+                await Promise.all(categoryPromises);
+
+                // Generate HTML table
+                const tableBody = document.getElementById("service-table-body");
+                let html = "";
+
+                categories.forEach(cat => {
+                    const catData = servicesByCategory[cat.slug];
+                    html += `<tr><th colspan='3'>${catData.name}</th></tr>`;
+
+                    catData.services.forEach(service => {
                         html += `<tr>
-                                    <td><input type='checkbox' class='service-checkbox' data-id='${service.id}' data-price='${service.price}'></td>
+                                    <td><input type='checkbox' class='service-checkbox'
+                                        data-catslug='${cat.slug}'
+                                        data-id='${service.id}'
+                                        data-price='${service.price}'></td>
                                     <td>${service.name}</td>
                                     <td>${service.price} Kč</td>
                                 </tr>`;
                     });
-
-                    tableBody.innerHTML = html;
-                    if (callback) callback();
                 });
+
+                tableBody.innerHTML = html;
+                if (callback) callback();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
         }
 
         function calculateTotal() {
@@ -83,29 +125,154 @@
             document.getElementById("total-price").textContent = total + " Kč";
         }
 
-        function shareSelection() {
-            const selected = [];
+        // Encode selection to compressed format per category
+        function encodeSelectionByCategory() {
+            const categoryData = {};
+
+            // Group selected services by category
             document.querySelectorAll('.service-checkbox:checked').forEach(checkbox => {
-                selected.push(checkbox.getAttribute('data-id'));
+                const catSlug = checkbox.getAttribute('data-catslug');
+                const id = parseInt(checkbox.getAttribute('data-id'));
+
+                if (!categoryData[catSlug]) {
+                    categoryData[catSlug] = [];
+                }
+                categoryData[catSlug].push(id);
             });
+
+            // Encode each category separately
+            const encodedParts = [];
+            for (const [slug, ids] of Object.entries(categoryData)) {
+                const catInfo = servicesByCategory[slug];
+                if (!catInfo) continue;
+
+                // Create bitmap for this category
+                const byteCount = Math.ceil((catInfo.maxId + 1) / 8);
+                const bitmap = new Uint8Array(byteCount);
+
+                ids.forEach(id => {
+                    const byteIndex = Math.floor(id / 8);
+                    const bitIndex = id % 8;
+                    bitmap[byteIndex] |= (1 << bitIndex);
+                });
+
+                // Compress using pako
+                const compressed = pako.deflate(bitmap);
+
+                // Convert to base64
+                let binary = '';
+                compressed.forEach(byte => {
+                    binary += String.fromCharCode(byte);
+                });
+
+                const encoded = btoa(binary)
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=/g, '');
+
+                encodedParts.push(`${slug}=${encoded}`);
+            }
+
+            return encodedParts.join(',');
+        }
+
+        // Decode selection from compressed format per category
+        function decodeSelectionByCategory(hash) {
+            const selections = {};
+
+            if (!hash) return selections;
+
+            // Parse hash parameters (e.g. "news=eJx...,fun=eJy...")
+            const parts = hash.split(',');
+
+            parts.forEach(part => {
+                const [slug, encoded] = part.split('=');
+                if (!slug || !encoded) return;
+
+                const catInfo = servicesByCategory[slug];
+                if (!catInfo) return;
+
+                try {
+                    // Convert from URL-safe base64
+                    const base64 = encoded
+                        .replace(/-/g, '+')
+                        .replace(/_/g, '/');
+
+                    // Add padding
+                    const padded = base64 + '=='.substring(0, (4 - base64.length % 4) % 4);
+
+                    // Decode base64
+                    const binary = atob(padded);
+                    const compressed = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) {
+                        compressed[i] = binary.charCodeAt(i);
+                    }
+
+                    // Decompress
+                    const bitmap = pako.inflate(compressed);
+
+                    // Convert bitmap to ID array
+                    const selectedIds = [];
+                    for (let byteIndex = 0; byteIndex < bitmap.length; byteIndex++) {
+                        for (let bitIndex = 0; bitIndex < 8; bitIndex++) {
+                            if (bitmap[byteIndex] & (1 << bitIndex)) {
+                                const id = byteIndex * 8 + bitIndex;
+                                if (id > 0 && id <= catInfo.maxId) {
+                                    selectedIds.push(id);
+                                }
+                            }
+                        }
+                    }
+
+                    selections[slug] = selectedIds;
+                } catch (e) {
+                    console.error(`Error decoding category ${slug}:`, e);
+                }
+            });
+
+            return selections;
+        }
+
+        function shareSelection() {
+            const selectedCount = document.querySelectorAll('.service-checkbox:checked').length;
+            if (selectedCount === 0) {
+                alert("Nejprve vyberte alespoň jednu službu!");
+                return;
+            }
+
+            const encoded = encodeSelectionByCategory();
             const url = new URL(window.location.href);
-            url.searchParams.set('selected', selected.join(','));
+            url.hash = encoded || '';
+            url.search = ''; // Clear old parameters
+
             navigator.clipboard.writeText(url.toString()).then(() => {
                 alert("Odkaz zkopírován: " + url.toString());
             });
         }
 
-        window.onload = function () {
-            loadTable(() => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const selected = urlParams.get('selected');
-                if (selected) {
-                    selected.split(',').forEach(id => {
-                        const checkbox = document.querySelector(`.service-checkbox[data-id='${id}']`);
+        function loadSelectionFromUrl() {
+            const hash = window.location.hash.substring(1);
+
+            if (hash) {
+                // New per-category format (news=eJx...,fun=eJy...)
+                const selections = decodeSelectionByCategory(hash);
+
+                for (const [slug, ids] of Object.entries(selections)) {
+                    ids.forEach(id => {
+                        const checkbox = document.querySelector(
+                            `.service-checkbox[data-catslug='${slug}'][data-id='${id}']`
+                        );
                         if (checkbox) checkbox.checked = true;
                     });
-                    calculateTotal();
                 }
+
+                calculateTotal();
+            }
+        }
+
+        window.onload = function () {
+            loadTable(() => {
+                loadSelectionFromUrl();
             });
 
             document.getElementById("service-table-body").addEventListener("change", calculateTotal);
@@ -119,6 +286,13 @@
     </div>
     <div class="content">
         <h1>Předplatné služeb, vzdyt je to jenom...</h1>
+
+        <div class="info-box">
+            <h3>Jak to funguje?</h3>
+            <p>Vyberte služby, které platíte nebo zvažujete. Kalkulačka vám ukáže celkovou měsíční částku.</p>
+            <p>Tlačítkem "Sdílet výběr" zkopírujete odkaz, který můžete poslat kamarádům - uvidí váš výběr včetně ceny.</p>
+        </div>
+
         <table>
             <thead>
                 <tr>

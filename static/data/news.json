@@ -8,5 +8,6 @@
   { "id": 7, "name": "Hospodarske Noviny +", "price": 299 },
   { "id": 8, "name": "Hospodarske Noviny + vikend", "price": 457 },
   { "id": 9, "name": "Hospodarske Noviny + tisk", "price": 850 },
-  { "id": 10, "name": "Seznam", "price": 30 }
+  { "id": 10, "name": "Seznam", "price": 30 },
+  { "id": 11, "name": "Respekt", "price": 200 }
 ]

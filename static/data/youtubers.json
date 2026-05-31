@@ -10,5 +10,6 @@
   { "id": 9, "name": "Kluci z Prahy Hero Hero", "price": 120 },
   { "id": 10, "name": "Standashow Talk.cz", "price": 249 },
   { "id": 11, "name": "Události Luďka Staňka Hero Hero", "price": 120 },
-  { "id": 12, "name": "DVTV", "price": 199 }
+  { "id": 12, "name": "DVTV", "price": 199 },
+  { "id": 13, "name": "Moravec VM", "price": 229 }
 ]
